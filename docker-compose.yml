@@ -1,0 +1,29 @@
+services:
+  app:
+    image: 'nuvem/system_place_manger:latest'
+    build:
+      context: ../infra
+    container_name: app
+    depends_on:
+      - db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=elmonha
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=elmonha
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+
+    ports:
+      - "8080:8080"
+
+  db:
+    image: postgres
+    container_name: db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=elmonha
+      - POSTGRES_DB=postgres
+    ports:
+      - "5433:5432"
+
