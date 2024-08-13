@@ -54,7 +54,7 @@ public class CityTests {
     }
 
     @Test
-    void testCityGetById(){
+    void testCityGetById() {
         var city = cityRepository.findByNameAndActiveTrue("GRAMADO").get();
         webTestClient.get().uri("/cities/" + city.getId()).exchange()
                 .expectStatus()
@@ -63,7 +63,7 @@ public class CityTests {
     }
 
     @Test
-    void testCityGetAll(){
+    void testCityGetAll() {
         var expectedCities = cityRepository.findByActiveTrue();
 
         webTestClient.get()
