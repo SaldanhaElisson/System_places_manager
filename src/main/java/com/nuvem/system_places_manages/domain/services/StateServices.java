@@ -40,7 +40,7 @@ public class StateServices {
                 .orElseThrow(() -> new EntityNotFoundException("Id não encontrado ou cidade não está ativa."));
     }
 
-    public List<StateEntity> getAll(){
+    public List<StateEntity> getAll() {
         return stateRepository.findByActiveTrue();
     }
 
@@ -51,7 +51,7 @@ public class StateServices {
         stateRepository.save(stateEntity);
     }
 
-    public StateEntity update( UUID id, StateDTO stateDTO)  {
+    public StateEntity update(UUID id, StateDTO stateDTO) {
 
         if (stateRepository.existsByUF(stateDTO.UF())) {
             BindingResult bindingResult = new BeanPropertyBindingResult(stateDTO, "stateDTO");
@@ -69,8 +69,6 @@ public class StateServices {
 
         StateEntity stateEntity = stateRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Id não encontrado."));
-
-
 
 
         BeanUtils.copyProperties(stateDTO, stateEntity, getNullPropertyNames(stateDTO));

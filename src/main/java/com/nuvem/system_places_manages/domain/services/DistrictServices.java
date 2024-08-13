@@ -39,13 +39,13 @@ public class DistrictServices {
         return districtRepository.save(districtEntity);
     }
 
-    public DistrictEntity getById(UUID id){
+    public DistrictEntity getById(UUID id) {
         return districtRepository.findByIdAndActiveTrue(id)
                 .filter(DistrictEntity::isActive) // Filtra apenas cidades ativas
                 .orElseThrow(() -> new EntityNotFoundException("Id não encontrado ou District não está ativa."));
     }
 
-    public List<DistrictEntity> getAll(){
+    public List<DistrictEntity> getAll() {
         return districtRepository.findByActiveTrue();
     }
 
@@ -56,7 +56,7 @@ public class DistrictServices {
         districtRepository.save(districtEntity);
     }
 
-    public DistrictEntity update( UUID id, DistrictDTO districtDTO){
+    public DistrictEntity update(UUID id, DistrictDTO districtDTO) {
         DistrictEntity districtEntity = districtRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Id não encontrado."));
 

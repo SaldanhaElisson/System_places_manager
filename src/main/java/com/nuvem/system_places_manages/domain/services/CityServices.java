@@ -18,8 +18,8 @@ import static com.nuvem.system_places_manages.infra.Util.getNullPropertyNames;
 @Service
 public class CityServices {
 
-    private  final CityRepository cityRepository;
-    private  final StateRepository stateRepository;
+    private final CityRepository cityRepository;
+    private final StateRepository stateRepository;
 
     public CityServices(CityRepository cityRepository, StateRepository stateRepository) {
         this.cityRepository = cityRepository;
@@ -27,7 +27,7 @@ public class CityServices {
     }
 
     @Transactional
-    public CityEntity  create(CityDTO cityDTO){
+    public CityEntity create(CityDTO cityDTO) {
         StateEntity stateEntity = stateRepository.findByNameAndActiveTrue(cityDTO.stateName())
                 .orElseThrow(() -> new EntityNotFoundException("Estado não encontrado: " + cityDTO.stateName()));
 
@@ -39,13 +39,13 @@ public class CityServices {
         return cityRepository.save(cityEntity);
     }
 
-    public CityEntity getById(UUID id){
+    public CityEntity getById(UUID id) {
         return cityRepository.findByIdAndActiveTrue(id)
                 .filter(CityEntity::isActive) // Filtra apenas cidades ativas
                 .orElseThrow(() -> new EntityNotFoundException("Id não encontrado ou cidade não está ativa."));
     }
 
-    public List<CityEntity> getAll(){
+    public List<CityEntity> getAll() {
         return cityRepository.findByActiveTrue();
     }
 
@@ -56,7 +56,7 @@ public class CityServices {
         cityRepository.save(cityEntity);
     }
 
-    public CityEntity update( UUID id, CityDTO cityDTO){
+    public CityEntity update(UUID id, CityDTO cityDTO) {
         CityEntity cityEntity = cityRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Id não encontrado."));
 

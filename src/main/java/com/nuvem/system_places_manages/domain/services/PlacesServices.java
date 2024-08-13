@@ -44,7 +44,7 @@ public class PlacesServices {
         districtEntity.addPlace(placeEntity);
 
         placeEntity = placeRepository.save(placeEntity);
-        ;
+
 
         return new PlaceResponse(
                 placeEntity.getId(),
@@ -103,8 +103,6 @@ public class PlacesServices {
                 linkTo(methodOn(PlaceController.class).getAllPlaces()).withSelfRel()
         );
     }
-
-    // Método auxiliar para obter os nomes das propriedades nulas
 
 
     public PlaceResponse update(UUID id, PlaceDTO placeDto) {
