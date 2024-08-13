@@ -33,7 +33,7 @@ public class DistrictServices {
                 .orElseThrow(() -> new EntityNotFoundException("Cidade não encontrada ou desativada: " + districtDTO.cityName()));
 
         DistrictEntity districtEntity = new DistrictEntity();
-        BeanUtils.copyProperties(districtDTO, districtEntity, "nameCity");
+        BeanUtils.copyProperties(districtDTO, districtEntity, "cityName");
         cityEntity.addDistrict(districtEntity);
 
         return districtRepository.save(districtEntity);
