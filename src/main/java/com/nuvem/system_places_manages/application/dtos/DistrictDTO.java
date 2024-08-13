@@ -16,5 +16,6 @@ public record DistrictDTO(
 
     public DistrictDTO {
         name = name.toUpperCase();
+        cityName = cityName.toUpperCase();
     }
 }
