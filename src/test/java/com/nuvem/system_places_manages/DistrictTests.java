@@ -65,7 +65,7 @@ public class DistrictTests {
     }
 
     @Test
-    void testDistrictGetById(){
+    void testDistrictGetById() {
         var district = districtRepository.findByNameAndActiveTrue("BAIRRO NOVO").get();
         webTestClient.get().uri("/districts/" + district.getId()).exchange()
                 .expectStatus()
@@ -74,7 +74,7 @@ public class DistrictTests {
     }
 
     @Test
-    void testDistrictGetAll(){
+    void testDistrictGetAll() {
         var expectedDistricts = districtRepository.findByActiveTrue();
 
         webTestClient.get()
