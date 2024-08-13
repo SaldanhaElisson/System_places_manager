@@ -15,7 +15,7 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name="places")
+@Table(name = "places")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class PlaceEntity extends RepresentationModel<PlaceEntity> implements Serializable {
     @Serial

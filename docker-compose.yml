@@ -2,7 +2,7 @@ services:
   app:
     image: 'nuvem/system_place_manger:latest'
     build:
-      context: ../infra
+      context: .
     container_name: app
     depends_on:
       - db
@@ -27,4 +27,3 @@ services:
       - POSTGRES_DB=postgres
     ports:
       - "5433:5432"
-

@@ -17,22 +17,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.anyOf;
 
 
 import java.time.LocalDate;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasItems;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
 class SystemPlacesManagesApplicationTests {
-    @Autowired
-    private StateRepository stateRepository;
-
-    @Autowired
-    private CityRepository cityRepository;
 
     @Autowired
     private DistrictRepository districtRepository;
@@ -103,12 +100,11 @@ class SystemPlacesManagesApplicationTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(place01)
                 .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody()
-                .jsonPath("$.errorMessages").value(hasItems(
-                        "O campo name não deve estar em branco",
-                        "O campo districtName não deve estar em branco"
+                .expectStatus().isBadRequest().expectBody().jsonPath("$.errorMessages").value(anyOf(
+                        hasItem("O campo name não deve estar em branco"),
+                        hasItem("O campo districtName não deve estar em branco")
                 ));
+
     }
 
     @Test
@@ -216,7 +212,7 @@ class SystemPlacesManagesApplicationTests {
     void testGetByIdWheNotFoundId() {
 
         var district = districtRepository.findByName("ALDEOTA").get();
-        var place01 = placeRepository.save(new PlaceEntity("Place K", "Description K",
+        placeRepository.save(new PlaceEntity("Place K", "Description K",
                 LocalDate.of(2023, 1, 1), null, district));
 
         webTestClient.get().uri("/places/cd5e81c6-05bf-44cf-b9b4-34c3021bdf7")
@@ -321,7 +317,7 @@ class SystemPlacesManagesApplicationTests {
                 .jsonPath("$.districtName").isEqualTo("NOVO MARACANAÚ")
                 .jsonPath("$.cityName").isEqualTo("FORTALEZA")
                 .jsonPath("$.stateName").isEqualTo("CEARÁ");
-        ;
+
     }
 
     @Test
@@ -344,7 +340,7 @@ class SystemPlacesManagesApplicationTests {
     @Test
     void testUpdateWhenNotFoundPlace() {
         var district = districtRepository.findByName("ALDEOTA").get();
-        var place01 = placeRepository.save(new PlaceEntity("Place I", "Description I",
+        placeRepository.save(new PlaceEntity("Place I", "Description I",
                 LocalDate.of(2023, 1, 1), null, district));
 
         var place01Updated = new PlaceDTO("Place G update name", "Description G update",

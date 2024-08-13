@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name="cities")
+@Table(name = "cities")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class CityEntity implements Serializable {
     @Serial
@@ -47,6 +47,7 @@ public class CityEntity implements Serializable {
     }
 
     private boolean active = true;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

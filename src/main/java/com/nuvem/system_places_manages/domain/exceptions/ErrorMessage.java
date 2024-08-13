@@ -1,6 +1,7 @@
 package com.nuvem.system_places_manages.domain.exceptions;
 
 import lombok.Data;
+
 import java.time.LocalDateTime;
 import java.util.List;
 

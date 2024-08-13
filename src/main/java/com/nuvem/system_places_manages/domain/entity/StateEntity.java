@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name="states")
+@Table(name = "states")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class StateEntity implements Serializable {
     @Serial

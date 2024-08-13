@@ -24,7 +24,7 @@ public class UniqueNameValidator implements ConstraintValidator<UniqueName, Stri
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
         if (value == null) {
-            return true; // valores nulos são válidos, use @NotNull para verificar nulos
+            return true;
         }
 
         return !repository.existsByName(value);

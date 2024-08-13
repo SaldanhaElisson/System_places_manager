@@ -7,14 +7,13 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
 @Data
 @Entity
-@Table(name="districts")
+@Table(name = "districts")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class DistrictEntity implements Serializable {
     @Serial

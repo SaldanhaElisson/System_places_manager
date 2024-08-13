@@ -10,8 +10,12 @@ import java.util.UUID;
 @NoRepositoryBean
 public interface BaseRepository<T, ID> extends JpaRepository<T, ID> {
     boolean existsByName(String name);
+
     Optional<T> findByName(String name);
+
     List<T> findByActiveTrue();
+
     Optional<T> findByNameAndActiveTrue(String name);
+
     Optional<T> findByIdAndActiveTrue(UUID id);
 }
