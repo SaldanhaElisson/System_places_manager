@@ -1,8 +1,9 @@
 package com.nuvem.system_places_manages.application.controllers;
 
 import com.nuvem.system_places_manages.application.dtos.PlaceDTO;
-import com.nuvem.system_places_manages.domain.models.PlaceModel;
+import com.nuvem.system_places_manages.application.responses.PlaceResponse;
 import com.nuvem.system_places_manages.domain.services.PlacesServices;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,30 +24,47 @@ public class PlaceController {
     }
 
     @PostMapping
-    public ResponseEntity<PlaceModel> savePlace(@RequestBody  @Valid PlaceDTO placeDto) {
+    public ResponseEntity<PlaceResponse> savePlace(@RequestBody @Valid PlaceDTO placeDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(placesServices.create(placeDto));
     }
 
     @GetMapping
-    public ResponseEntity<List<PlaceModel>> getAllPlaces() {
+    public ResponseEntity<List<PlaceResponse>> getAllPlaces() {
         return ResponseEntity.status(HttpStatus.OK).body(placesServices.getAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PlaceModel> getPlaceById(@PathVariable UUID id) {
-        return ResponseEntity.status(HttpStatus.OK).body(placesServices.getById(id));
-    }
+    public ResponseEntity<PlaceResponse> getPlaceById(@PathVariable String id) {
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Object> updatePlace( @PathVariable(value="id") UUID id, @RequestBody  PlaceDTO placeDTO) {
-        return ResponseEntity.status(HttpStatus.OK).body(placesServices.update(id, placeDTO));
+        try {
+            UUID uuid = UUID.fromString(id);
+            return ResponseEntity.status(HttpStatus.OK).body(placesServices.getById(uuid));
+        } catch (IllegalArgumentException e) {
+            throw new EntityNotFoundException("Id não encontrado.");
+        }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deletePlace(@PathVariable(value="id") UUID id) {
+    public ResponseEntity<Object> deletePlace(@PathVariable(value = "id") String id) {
 
-        placesServices.delete(id);
-        return ResponseEntity.status(HttpStatus.OK).body("Place deletado com sucesso");
+        try {
+            UUID uuid = UUID.fromString(id);
+            placesServices.delete(uuid);
+            return ResponseEntity.status(HttpStatus.OK).body("Place deletado com sucesso");
+        } catch (IllegalArgumentException e) {
+            throw new EntityNotFoundException("Id não encontrado.");
+        }
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<PlaceResponse> updatePlace(@PathVariable(value = "id") String id, @RequestBody PlaceDTO placeDTO) {
+        try {
+            UUID uuid = UUID.fromString(id);
+            return ResponseEntity.status(HttpStatus.OK).body(placesServices.update(uuid, placeDTO));
+        } catch (IllegalArgumentException e) {
+            throw new EntityNotFoundException("Id não encontrado.");
+        }
+    }
+
 
 }

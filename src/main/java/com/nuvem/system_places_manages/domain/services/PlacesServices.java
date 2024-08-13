@@ -1,17 +1,19 @@
 package com.nuvem.system_places_manages.domain.services;
 
-import com.nuvem.system_places_manages.domain.Repository.PlaceRepository;
+import com.nuvem.system_places_manages.application.responses.PlaceResponse;
+import com.nuvem.system_places_manages.domain.repository.DistrictRepository;
+import com.nuvem.system_places_manages.domain.repository.PlaceRepository;
 import com.nuvem.system_places_manages.application.controllers.PlaceController;
 import com.nuvem.system_places_manages.application.dtos.PlaceDTO;
-import com.nuvem.system_places_manages.domain.models.PlaceModel;
+import com.nuvem.system_places_manages.domain.entity.DistrictEntity;
+import com.nuvem.system_places_manages.domain.entity.PlaceEntity;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
-
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+
+import static com.nuvem.system_places_manages.infra.Util.getNullPropertyNames;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -20,84 +22,129 @@ import java.util.*;
 
 @Service
 public class PlacesServices {
+
     private final PlaceRepository placeRepository;
-    private final String MESSAGE_NOT_FOUND_ENTITY = "Entidade não encontrada";
+    private final DistrictRepository districtRepository;
 
-
-    public PlacesServices(PlaceRepository placeRepository) {
+    public PlacesServices(PlaceRepository placeRepository, DistrictRepository districtRepository) {
         this.placeRepository = placeRepository;
+        this.districtRepository = districtRepository;
     }
 
-    public PlaceModel create(PlaceDTO placeDto) {
-        PlaceModel placeModel = new PlaceModel();
-        BeanUtils.copyProperties(placeDto, placeModel);
+    @Transactional
+    public PlaceResponse create(PlaceDTO placeDto) {
+        PlaceEntity placeEntity = new PlaceEntity();
+        BeanUtils.copyProperties(placeDto, placeEntity);
+        placeEntity.setCreateDate(LocalDate.now());
 
-        placeModel.setCreateDate(LocalDate.now());
+        DistrictEntity districtEntity = districtRepository.findByName(placeDto.districtName())
+                .orElseThrow(() -> new EntityNotFoundException("District não encontrado: " + placeDto.districtName()));
 
-        placeRepository.save(placeModel);
-        placeModel.add(linkTo(methodOn(PlaceController.class).getAllPlaces()).withSelfRel());
-        return placeModel;
 
+        districtEntity.addPlace(placeEntity);
+
+        placeEntity = placeRepository.save(placeEntity);
+        ;
+
+        return new PlaceResponse(
+                placeEntity.getId(),
+                placeEntity.getName(),
+                placeEntity.getDescription(),
+                placeEntity.getCreateDate(),
+                placeEntity.getUpdateDate(),
+                placeEntity.getDistrict().getName(),
+                placeEntity.getDistrict().getCity().getName(),
+                placeEntity.getDistrict().getCity().getState().getName(),
+                linkTo(methodOn(PlaceController.class).getAllPlaces()).withSelfRel()
+        );
     }
 
-    public List<PlaceModel> getAll() {
-        List<PlaceModel> places = placeRepository.findAll();
+    public List<PlaceResponse> getAll() {
+        List<PlaceEntity> placesEntities = placeRepository.findAll();
+        List<PlaceResponse> placeResponses = new ArrayList<>();
 
+        if (!placesEntities.isEmpty()) {
+            for (PlaceEntity place : placesEntities) {
+                UUID id = place.getId();
+                place.add(linkTo(methodOn(PlaceController.class).getPlaceById(id.toString())).withSelfRel());
+                PlaceResponse placeResponse = new PlaceResponse(
+                        place.getId(),
+                        place.getName(),
+                        place.getDescription(),
+                        place.getCreateDate(),
+                        place.getUpdateDate(),
+                        place.getDistrict().getName(),
+                        place.getDistrict().getCity().getName(),
+                        place.getDistrict().getCity().getState().getName(),
+                        linkTo(methodOn(PlaceController.class).getAllPlaces()).withSelfRel()
+                );
 
-        if (!places.isEmpty()) {
-            for (PlaceModel place : places) {
-                UUID id = place.getUuid();
-                place.add(linkTo(methodOn(PlaceController.class).getPlaceById(id)).withSelfRel());
+                placeResponses.add(placeResponse);
             }
         }
-        places.sort(Comparator.comparing(PlaceModel::getCreateDate));
-        return places;
+        placeResponses.sort(Comparator.comparing(PlaceResponse::createDate));
+        return placeResponses;
     }
 
-    public PlaceModel getById(UUID id) {
-        var placeModel = placeRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MESSAGE_NOT_FOUND_ENTITY));
+    public PlaceResponse getById(UUID id) {
+        PlaceEntity placeEntity = placeRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Id não encontrado."));
 
-        placeModel.add(linkTo(methodOn(PlaceController.class).getAllPlaces()).withSelfRel());
-        return placeModel;
+
+        return new PlaceResponse(
+                placeEntity.getId(),
+                placeEntity.getName(),
+                placeEntity.getDescription(),
+                placeEntity.getCreateDate(),
+                placeEntity.getUpdateDate(),
+                placeEntity.getDistrict().getName(),
+                placeEntity.getDistrict().getCity().getName(),
+                placeEntity.getDistrict().getCity().getState().getName(),
+                linkTo(methodOn(PlaceController.class).getAllPlaces()).withSelfRel()
+        );
     }
-
 
     // Método auxiliar para obter os nomes das propriedades nulas
-    private String[] getNullPropertyNames(Object source) {
 
-        final BeanWrapper src = new BeanWrapperImpl(source);
-        java.beans.PropertyDescriptor[] atributes = src.getPropertyDescriptors();
 
-        Set<String> emptyNames = new HashSet<>();
-        for (java.beans.PropertyDescriptor atribute : atributes) {
-            Object srcValue = src.getPropertyValue(atribute.getName());
-            if (srcValue == null) emptyNames.add(atribute.getName());
+    public PlaceResponse update(UUID id, PlaceDTO placeDto) {
+        PlaceEntity placeEntity = placeRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Id não encontrado."));
+
+        BeanUtils.copyProperties(placeDto, placeEntity, getNullPropertyNames(placeDto));
+        placeEntity.setUpdateDate(LocalDate.now());
+
+        if (placeDto.districtName() != null) {
+
+            placeEntity.getDistrict().removePlace(placeEntity);
+
+            DistrictEntity districtEntity = districtRepository.findByName(placeDto.districtName())
+                    .orElseThrow(() -> new EntityNotFoundException("District não encontrado: " + placeDto.districtName()));
+
+            districtEntity.addPlace(placeEntity);
         }
-        String[] result = new String[emptyNames.size()];
-        return emptyNames.toArray(result);
-    }
 
-    public PlaceModel update(UUID id, PlaceDTO placeDto) {
-        var placeModel = placeRepository.findById(id).
-                orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MESSAGE_NOT_FOUND_ENTITY));
+        placeRepository.save(placeEntity);
 
-        BeanUtils.copyProperties(placeDto, placeModel, getNullPropertyNames(placeDto));
-        placeModel.setUpdateDate(LocalDate.now());
-
-        placeRepository.save(placeModel);
-
-        placeModel.add(linkTo(methodOn(PlaceController.class).getAllPlaces()).withSelfRel());
-        return placeModel;
+        return new PlaceResponse(
+                placeEntity.getId(),
+                placeEntity.getName(),
+                placeEntity.getDescription(),
+                placeEntity.getCreateDate(),
+                placeEntity.getUpdateDate(),
+                placeEntity.getDistrict().getName(),
+                placeEntity.getDistrict().getCity().getName(),
+                placeEntity.getDistrict().getCity().getState().getName(),
+                linkTo(methodOn(PlaceController.class).getAllPlaces()).withSelfRel()
+        );
     }
 
     public void delete(UUID id) {
 
-        var placeModel = placeRepository.findById(id).
-                orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MESSAGE_NOT_FOUND_ENTITY));
+        var placeModel = placeRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Place não encontrado"));
 
         placeRepository.delete(placeModel);
     }
-
 
 }

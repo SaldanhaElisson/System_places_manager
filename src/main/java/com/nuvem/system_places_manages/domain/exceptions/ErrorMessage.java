@@ -1,4 +1,4 @@
-package com.nuvem.system_places_manages.domain.execptions;
+package com.nuvem.system_places_manages.domain.exceptions;
 
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -20,6 +20,5 @@ public class ErrorMessage {
         this.status = status;
         this.errorMessages = errorMessages;
     }
-
 
 }
