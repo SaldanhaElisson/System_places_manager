@@ -25,6 +25,7 @@ Alguns testes de falha para as entidades cidade, Bairro e Estado foram omitidas,
 - **Lombok**: Para reduzir o código boilerplate.
 - **Spring Boot Starter Test**: Para testes unitários e de integração.
 - **H2 Database**: Banco de dados em memória para testes.
+- 
 - **Spring Boot Starter WebFlux**: Para suporte a programação reativa.
 - **Docker e Docker-compose**
 
@@ -60,6 +61,19 @@ Esta camada fornece suporte técnico para as camadas superiores, incluindo utili
 * **utils**: Classes utilitárias que fornecem funcionalidades genéricas e reutilizáveis em todo o sistema.
 * **handleController**: Tratamento de exceções genéricas, como exceções de infraestrutura, validação de dados e erros inesperados.
 
+### Modelagem do banco dedados
+A seguir a modelagem do banco de dados.
+
+![Modelagem do banco de daos](/modelagem-db.png)
+
+Adotei uma modelagem  de dados com alta granularidade e relacionamentos bidirecionais para garantir a integridade dos dados e 
+facilitar a navegação entre entidades relacionadas. A alta granularidade proporciona flexibilidade e precisão nas análises, 
+permitindo criar consultas otimizadas e representando o mundo real de forma mais fiel. Isso resulta em um sistema robusto e 
+eficiente, capaz de atender a demandas complexas e dinâmicas.
+
+### Maturidade Richardson
+A API proposta atinge o nível 4 no modelo de maturidade de REST APIs proposto por Richardson. Para isso, foi utilizada 
+a biblioteca HATEOAS, garantindo facilidade na navegação pela entidade places.
 ## Como Rodar a Aplicação
 
 As seguintes instruções são para usuários de Linux ou Windows com WSL.
@@ -122,9 +136,3 @@ Para contribuir com este projeto, siga os passos abaixo:
    ```
 5. Abra um Pull Request.
 
-## Licença
-
-Este projeto está licenciado sob a Licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
-
-Se precisar de mais alguma coisa ou tiver outras dúvidas, estou aqui para ajudar!
