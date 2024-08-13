@@ -112,7 +112,7 @@ public class PlacesServices {
         BeanUtils.copyProperties(placeDto, placeEntity, getNullPropertyNames(placeDto));
         placeEntity.setUpdateDate(LocalDate.now());
 
-        if (placeDto.districtName() != null) {
+        if (placeDto.districtName() != null && !placeDto.districtName().isEmpty()) {
 
             placeEntity.getDistrict().removePlace(placeEntity);
 

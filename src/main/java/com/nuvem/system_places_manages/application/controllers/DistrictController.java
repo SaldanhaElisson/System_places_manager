@@ -1,6 +1,7 @@
 package com.nuvem.system_places_manages.application.controllers;
 
 import com.nuvem.system_places_manages.application.dtos.DistrictDTO;
+import com.nuvem.system_places_manages.application.responses.DistrictResponse;
 import com.nuvem.system_places_manages.domain.entity.DistrictEntity;
 import com.nuvem.system_places_manages.domain.services.DistrictServices;
 import jakarta.persistence.EntityNotFoundException;
@@ -22,12 +23,13 @@ public class DistrictController {
     }
 
     @PostMapping
-    public ResponseEntity<DistrictEntity> saveStateWithCitiesAndDistricts(@RequestBody @Valid DistrictDTO districtDTO) {
+    public ResponseEntity<DistrictResponse> saveStateWithCitiesAndDistricts(@RequestBody @Valid DistrictDTO districtDTO) {
+
         return ResponseEntity.status(HttpStatus.CREATED).body(districtServices.create(districtDTO));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DistrictEntity> getCityById(@PathVariable String id) {
+    public ResponseEntity<DistrictResponse> getCityById(@PathVariable String id) {
 
         try {
             UUID uuid = UUID.fromString(id);

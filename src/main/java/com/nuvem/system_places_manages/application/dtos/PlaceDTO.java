@@ -16,6 +16,6 @@ public record PlaceDTO(
         @NotBlank @NotNull String districtName
 ) {
     public PlaceDTO {
-        districtName = districtName.toUpperCase();
+        districtName = districtName == null ? "" : districtName.toUpperCase();
     }
 }

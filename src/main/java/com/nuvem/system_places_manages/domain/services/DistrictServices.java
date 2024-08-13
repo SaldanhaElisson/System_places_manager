@@ -1,6 +1,7 @@
 package com.nuvem.system_places_manages.domain.services;
 
 import com.nuvem.system_places_manages.application.dtos.DistrictDTO;
+import com.nuvem.system_places_manages.application.responses.DistrictResponse;
 import com.nuvem.system_places_manages.domain.repository.CityRepository;
 import com.nuvem.system_places_manages.domain.repository.DistrictRepository;
 import com.nuvem.system_places_manages.domain.entity.CityEntity;
@@ -27,7 +28,7 @@ public class DistrictServices {
     }
 
     @Transactional
-    public DistrictEntity create(DistrictDTO districtDTO) {
+    public DistrictResponse create(DistrictDTO districtDTO) {
 
         CityEntity cityEntity = cityRepository.findByNameAndActiveTrue(districtDTO.cityName())
                 .orElseThrow(() -> new EntityNotFoundException("Cidade não encontrada ou desativada: " + districtDTO.cityName()));
@@ -36,14 +37,19 @@ public class DistrictServices {
         BeanUtils.copyProperties(districtDTO, districtEntity, "cityName");
         cityEntity.addDistrict(districtEntity);
 
-        return districtRepository.save(districtEntity);
+        districtRepository.save(districtEntity);
+
+        return new DistrictResponse(districtEntity.getId(), districtEntity.getName(), districtEntity.getCity().getName());
     }
 
-    public DistrictEntity getById(UUID id) {
-        return districtRepository.findByIdAndActiveTrue(id)
+    public DistrictResponse getById(UUID id) {
+        DistrictEntity districtEntity = districtRepository.findByIdAndActiveTrue(id)
                 .filter(DistrictEntity::isActive) // Filtra apenas cidades ativas
                 .orElseThrow(() -> new EntityNotFoundException("Id não encontrado ou District não está ativa."));
+
+        return new DistrictResponse(districtEntity.getId(), districtEntity.getName(), districtEntity.getCity().getName());
     }
+
 
     public List<DistrictEntity> getAll() {
         return districtRepository.findByActiveTrue();

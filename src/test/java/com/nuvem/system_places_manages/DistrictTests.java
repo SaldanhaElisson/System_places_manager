@@ -33,8 +33,7 @@ public class DistrictTests {
     private WebTestClient webTestClient;
 
     @BeforeAll
-    public static void setUp(@Autowired StateRepository stateRepository,
-                             @Autowired CityRepository cityRepository,
+    public static void setUp(@Autowired StateRepository stateRepository, @Autowired CityRepository cityRepository,
                              @Autowired DistrictRepository districtRepository) {
         StateEntity state = new StateEntity();
         state.setName("Rio Grande do Sul2");
@@ -48,53 +47,39 @@ public class DistrictTests {
 
         DistrictEntity district = new DistrictEntity();
         district.setName("Bairro novo");
-        district.setCity(city);
+        city.addDistrict(district);
         districtRepository.save(district);
     }
 
     @Test
     void testCreateDistrictSuccess() {
 
-        var district = new DistrictDTO("Floresta", "CIDADE NOVA3", null);
+        var district = new DistrictDTO("Floresta", "Cidade nova3", null);
 
-        webTestClient.post().uri("/districts")
-                .contentType(MediaType.APPLICATION_JSON).bodyValue(district)
-                .exchange().expectStatus()
-                .isCreated().expectBody(DistrictEntity.class)
-                .returnResult();
+        webTestClient.post().uri("/districts").contentType(MediaType.APPLICATION_JSON).bodyValue(district).exchange()
+                .expectStatus().isCreated().expectBody(DistrictEntity.class).returnResult();
     }
 
     @Test
     void testDistrictGetById() {
         var district = districtRepository.findByNameAndActiveTrue("BAIRRO NOVO").get();
-        webTestClient.get().uri("/districts/" + district.getId()).exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(DistrictEntity.class);
+        webTestClient.get().uri("/districts/" + district.getId()).exchange().expectStatus().isOk().expectBody(DistrictEntity.class);
     }
 
     @Test
     void testDistrictGetAll() {
         var expectedDistricts = districtRepository.findByActiveTrue();
 
-        webTestClient.get()
-                .uri("/districts")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBodyList(DistrictEntity.class)
-                .value(states -> {
-                    assertThat(states).hasSize(expectedDistricts.size());
-                    assertThat(states).containsAll(expectedDistricts);
-                });
+        webTestClient.get().uri("/districts").exchange().expectStatus().isOk().expectBodyList(DistrictEntity.class).value(states -> {
+            assertThat(states).hasSize(expectedDistricts.size());
+            assertThat(states).containsAll(expectedDistricts);
+        });
     }
 
     @Test
     void testDeleteDistrictSuccess() {
         var district = districtRepository.findByName("BAIRRO NOVO").orElseThrow();
-        webTestClient.delete()
-                .uri("/districts/" + district.getId())
-                .exchange()
-                .expectStatus().isOk();
+        webTestClient.delete().uri("/districts/" + district.getId()).exchange().expectStatus().isOk();
     }
 
     @Test
@@ -112,9 +97,7 @@ public class DistrictTests {
 
         var districtUpdate = new DistrictDTO("Novo Pajuçara", "Rio de Janeiro3", null);
 
-        webTestClient.put().uri("/districts/" + district.getId())
-                .bodyValue(districtUpdate)
-                .exchange().expectStatus().isOk();
+        webTestClient.put().uri("/districts/" + district.getId()).bodyValue(districtUpdate).exchange().expectStatus().isOk();
     }
 
 }
